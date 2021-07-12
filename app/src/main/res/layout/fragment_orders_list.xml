@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data class="OrdersListFragmentView">
+
+        <variable
+            name="viewState"
+            type="com.samir.dinntask.shared.domain.orders.OrdersViewState" />
+
+        <variable
+            name="adapter"
+            type="com.samir.dinntask.orders.presentation.adapter.OrdersAdapter" />
+
+        <variable
+            name="actionHandler"
+            type="com.samir.dinntask.orders.presentation.adapter.IActionHandler" />
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/toolbarView"
+                layout="@layout/orders_tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:actionHandler="@{actionHandler}"
+                app:itemCounts="@{viewState.orders != null ?viewState.orders.size():0}" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/order_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/home_back"
+                android:visibility="@{viewState.error == null}"
+                app:adapter="@{adapter}"
+                app:itemSpacing="@{@dimen/order_list_item_spacing}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbarView"
+                app:ordersViewState="@{viewState}"
+                tools:listitem="@layout/orders_list_item" />
+
+            <ProgressBar
+                android:id="@+id/order_fetch_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateOnly="true"
+                android:visibility="@{viewState.loading}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/order_fetch_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:onClick="@{()-> actionHandler.retry()}"
+                android:text="@string/no_order"
+                android:textColor="@color/textBlack"
+                app:goneUnless="@{viewState.orders.isEmpty() &amp;&amp; !viewState.loading}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/order_fetch_progress" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</layout>
